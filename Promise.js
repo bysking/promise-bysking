@@ -43,25 +43,33 @@ class Promise {
 
     }
     then (onfulfilled, onreject) {
-        if (this.status === RESOLVED) {
-            onfulfilled && onfulfilled(this.value)
-        }
 
-        if (this.status === REJECTED) {
-            onreject && onreject(this.reason)
-        }
+        let Promise2 = new Promise((resolve, reject) => {
+            if (this.status === RESOLVED) {
+                let x = onfulfilled && onfulfilled(this.value); // x的值类型需要判断：普通值还是Promise
+                resolve(x)
+            }
+    
+            if (this.status === REJECTED) {
+                let y = onreject && onreject(this.reason);
+                reject(y);
+            }
+    
+            if (this.status === PENDING) {
+    
+                // 如果是异步，就先订阅好
+                onfulfilled && this.onfulfilledArr.push(() => {// 这样套一层方便做切片加入自定义逻辑
+                    onfulfilled(this.value)
+                });
+    
+                onreject && this.onrejectArr.push(() => { // 这样套一层方便做切片加入自定义逻辑
+                    onreject(this.reason)
+                })
+            }
 
-        if (this.status === PENDING) {
+        })
 
-            // 如果是异步，就先订阅好
-            onfulfilled && this.onfulfilledArr.push(() => {// 这样套一层方便做切片加入自定义逻辑
-                onfulfilled(this.value)
-            });
-
-            onreject && this.onrejectArr.push(() => { // 这样套一层方便做切片加入自定义逻辑
-                onreject(this.reason)
-            })
-        }
+        return Promise2;
     }
 }
 
