@@ -91,6 +91,9 @@ class Promise {
     }
     then(onfulfilled, onreject) {
 
+        onfulfilled = typeof onfulfilled === 'function' ? onfulfilled : data => data;
+        onreject = typeof onreject === 'function' ? onreject : err => { throw err;}
+
         let Promise2 = new Promise((resolve, reject) => {
             if (this.status === RESOLVED) {
 
