@@ -3,10 +3,16 @@ const RESOLVED = 'RESOLVED'
 const REJECTED = 'REJECTED'
 
 
+// 因为所有的Primise都遵循这个规范， 规定这里写法必须兼容所有的promise, 需要遵循规范进行编写
 const resolvePromise = function (Promise2, x, resolve, reject) {
     // console.log(Promise2);
-    throw new Error('123')
+    // throw new Error('123')
 
+
+    // 判断x值类型, 
+    if (Promise2 === x) {
+        reject(new TypeError('循环引用'))
+    }
 }
 class Promise {
     constructor(executor) {
