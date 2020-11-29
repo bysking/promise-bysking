@@ -9,12 +9,17 @@ class Promise {
         this.reason = undefined;
 
         let resolve = (value) => {
-            this.value = value;
-            this.status = RESOLVED;
+            if (this.status === PENDING) { // 状态pending才能修改状态
+                this.value = value;
+                this.status = RESOLVED;
+            }
         }
         let reject = (reason) => {
-            this.reason = reason;
-            this.status = REJECTED
+
+            if (this.status === PENDING) {
+                this.reason = reason;
+                this.status = REJECTED
+            }
         }
         executor(resolve, reject);
 
