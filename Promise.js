@@ -29,7 +29,14 @@ class Promise {
         }
 
     }
-    then () {
+    then (onfulfilled, onreject) {
+        if (this.status === RESOLVED) {
+            onfulfilled && onfulfilled(this.value)
+        }
+
+        if (this.status === REJECTED) {
+            onreject && onreject(this.reason)
+        }
     }
 }
 
