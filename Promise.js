@@ -21,7 +21,12 @@ class Promise {
                 this.status = REJECTED
             }
         }
-        executor(resolve, reject);
+
+        try {
+            executor(resolve, reject);
+        } catch (err) {
+            reject(err); // 执行时发生错误，报错等同于调用reject
+        }
 
     }
     then () {
