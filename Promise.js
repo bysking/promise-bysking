@@ -2,8 +2,14 @@ const PENDING = 'PENDING'
 const RESOLVED = 'RESOLVED'
 const REJECTED = 'REJECTED'
 
+
+const resolvePromise = function (Promise2, x, resolve, reject) {
+    // console.log(Promise2);
+    throw new Error('123')
+
+}
 class Promise {
-    constructor (executor) {
+    constructor(executor) {
         this.status = PENDING;
         this.value = undefined;
         this.reason = undefined;
@@ -15,7 +21,7 @@ class Promise {
             if (this.status === PENDING) { // 状态pending才能修改状态
                 this.value = value;
                 this.status = RESOLVED;
-                
+
                 // 订阅列表执行
                 this.onfulfilledArr.forEach(fn => { // 依次取出执行
                     fn()
@@ -42,28 +48,67 @@ class Promise {
         }
 
     }
-    then (onfulfilled, onreject) {
+    then(onfulfilled, onreject) {
 
         let Promise2 = new Promise((resolve, reject) => {
             if (this.status === RESOLVED) {
-                let x = onfulfilled && onfulfilled(this.value); // x的值类型需要判断：普通值还是Promise
-                resolve(x)
+
+                setTimeout(() => { // js执行顺序先new再赋值给Promise2这里面才能拿到值，需要延迟，于是放到宏任务队列
+
+                    try { // 处理异常
+                        let x = onfulfilled && onfulfilled(this.value); // x的值类型需要判断：普通值还是Promise
+                        resolvePromise(Promise2, x, resolve, reject)
+                    } catch (e) {
+                        reject(e)
+                    }
+                }, 0)
+                // resolve(x)
             }
-    
+
             if (this.status === REJECTED) {
-                let y = onreject && onreject(this.reason);
-                reject(y);
+
+                setTimeout(() => {
+                    try {
+                        let y = onreject && onreject(this.reason);
+                        resolvePromise(Promise2, y, resolve, reject)
+                    } catch (e) {
+                        reject(e)
+                    }
+
+                }, 0)
+                // reject(y);
             }
-    
+
+            // 处理异步情况
             if (this.status === PENDING) {
-    
+
                 // 如果是异步，就先订阅好
                 onfulfilled && this.onfulfilledArr.push(() => {// 这样套一层方便做切片加入自定义逻辑
-                    onfulfilled(this.value)
+                    setTimeout(() => {
+                        try {
+
+                            let x = onfulfilled(this.value); // x的值类型需要判断：普通值还是Promise
+                            resolvePromise(Promise2, x, resolve, reject)
+
+                        } catch (e) {
+                            reject(e)
+                        }
+                    }, 0)
                 });
-    
+
                 onreject && this.onrejectArr.push(() => { // 这样套一层方便做切片加入自定义逻辑
-                    onreject(this.reason)
+
+                    setTimeout(() => {
+
+                        try {
+                            let y = onreject(this.reason)
+                            resolvePromise(Promise2, y, resolve, reject)
+
+                        } catch (e) {
+                            reject(e)
+                        }
+
+                    }, 0)
                 })
             }
 

@@ -8,7 +8,7 @@ let p = new Promise((resolve, reject) => {
     console.log(data);
 }).then(data => {
     console.log(data + '111');
-})
+}, err => console.log('111'+err))
 
 // let fs = require('fs');
 // function read (url) {
