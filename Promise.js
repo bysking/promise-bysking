@@ -9,9 +9,31 @@ const resolvePromise = function (Promise2, x, resolve, reject) {
     // throw new Error('123')
 
 
-    // 判断x值类型, 
+    // 判断x值类型, 不能是同一个，否则直接reject 一个类型错误
     if (Promise2 === x) {
         reject(new TypeError('循环引用'))
+    }
+
+    // 如果是对象
+    if (typeof x === 'object' && x !== null || typeof x === 'function') {
+
+        try {
+            let then = x.then // 有可能是Object.defineProperty定义的返回别的东西
+            if (typeof then === 'function') {
+                then.call(x, y => { // 采用promise的成功结果向下传递
+                    resolve(y)
+                }, r => { // 采用promise的失败结果向下传递
+                    reject(r)
+                })
+            } else { // { then: 1 }
+                resolve(x)
+            }
+        } catch(e) {
+            reject(e)
+        }
+    } else {
+        // 否则是一个普通对象
+        resolve(x)
     }
 }
 class Promise {

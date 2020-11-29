@@ -32,11 +32,17 @@ let Promise = require('./Promise.js').Promise;
 // })
 
 let p = new Promise((resolve, reject) => {
-    resolve()
+    setTimeout(() => {
+        resolve(100)
+    }, 0)
 });
 
 let promise2 = p.then((res) => {
-    return promise2;
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            resolve('heoole')
+        }, 0)
+    });
 })
 
 promise2.then((res) => {
