@@ -16,19 +16,32 @@ const resolvePromise = function (Promise2, x, resolve, reject) {
 
     // 如果是对象
     if (typeof x === 'object' && x !== null || typeof x === 'function') {
-
+        let called;
         try {
             let then = x.then // 有可能是Object.defineProperty定义的返回别的东西
             if (typeof then === 'function') {
                 then.call(x, y => { // 采用promise的成功结果向下传递
-                    resolve(y)
+                    // resolve(y)
+                    if (called) {
+                        return
+                    }
+                    called = true
+                    resolvePromise(Promise2, y, resolve, reject) // 递归处理
                 }, r => { // 采用promise的失败结果向下传递
+                    if (called) {
+                        return
+                    }
+                    called = true
                     reject(r)
                 })
             } else { // { then: 1 }
                 resolve(x)
             }
         } catch(e) {
+            if (called) {
+                return
+            }
+            called = true
             reject(e)
         }
     } else {

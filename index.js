@@ -40,7 +40,9 @@ let p = new Promise((resolve, reject) => {
 let promise2 = p.then((res) => {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
-            resolve('heoole')
+            resolve(new Promise((resolve, reject) => {
+                resolve(6666)
+            }))
         }, 0)
     });
 })
