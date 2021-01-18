@@ -1,52 +1,15 @@
-let Promise = require('./Promise.js').Promise;
-// let p = new Promise((resolve, reject) => {
-//     // resolve('执行成功')
-//     setTimeout(() => {
-//         // reject('执行失败')
-//         resolve(p)
-//     }, 0)
-// }).then((data) => {
-//     console.log(data);
-//     return data;
-// }, err => console.log('111'+err)).then(data => {
-//     console.log(data + '111');
-// }, err => console.log('111'+err))
-
-// let fs = require('fs');
-// function read (url) {
-//     return new Promise((resolve, reject) => {
-//         fs.readFile(url, 'utf-8', (err, data) => {
-//             if (err) {
-//                 reject(err)
-//             }
-//             resolve(data)
-//         })
-//     })
-// }
-
-// read('./name.txt').then((data) => {
-//     console.log(data+'11111111');
-//     return data;
-// }).then((data) => {
-//     console.log(data + '2222222');
-// })
+let fs = require('fs');
 
 let p = new Promise((resolve, reject) => {
-    setTimeout(() => {
-        resolve(100)
-    }, 0)
+    // 执行一些逻辑
+
+    resolve('成功'); // 标记成功态，并设置数据
+
+    // reject('失败');// 标记失败态，并设置数据
 });
 
-let promise2 = p.then((res) => {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            resolve(new Promise((resolve, reject) => {
-                resolve(6666)
-            }))
-        }, 0)
-    });
+p.then((data) => {
+    console.log(data); // 成功的回调
+}, (err) => {
+    console.log(err); // 失败的回调
 })
-
-promise2.then((res) => {
-    console.log(res);
-}, err => console.log(err))  
