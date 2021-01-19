@@ -42,12 +42,39 @@ console.log('执行结束')
 ```
 
 - Promise（承诺，将来会执行的意思），是一种异步编程的解决方案
+- Promise A+ 规范 https://promisesaplus.com/ 
+- Promise A+ 规范 翻译版本 https://segmentfault.com/a/1190000018589798 
 
 控制台打印一下Promise:
 
 ƒ Promise() { [native code] // 本质上是一个函数或者对象class
 
 - Promise 基本用法
+
+Promise A+规范 内容：
+
+1. promise 是一个带有符合此规范的then方法的对象或者函数。
+2. thenable 是一个定义了一个then方法的对象或者函数
+3. value 是一个任意合法的JavaScript值（包括undefined， thenable，或者promise）。
+4.  reason 是一个指出为什么promise被rejected的值。
+5.  exception 是一个使用throw语句抛出的值。
+
+- 状态: pending,fulfilled 或者 rejected。
+```js
+const PENDING = 'PENDING'; // 等待状态：状态可以转移到FULLFILED or REJECTED
+const FULLFILED = 'FULLFILED'; // 成功状态 状态不可变 对应一个value 不可变
+const REJECTED = 'REJECTED'; // 拒绝状态 状态不可变 对应一个 reason 不可变
+
+class Promise {
+    constructor () {
+        this.status = PENDING; // 初始状态
+    }
+}
+```
+
+- then 方法 接收两个函数作为可选参数
+
+举个例子：promise.then(onFulfilled, onRejected)
 
 ```js
 let p = new Promise((resolve, reject) => {
@@ -59,11 +86,15 @@ let p = new Promise((resolve, reject) => {
 });
 
 p.then((data) => {
-    console.log(data); // 成功的回调
+    console.log(data); // 成功的回调onFulfilled
 }, (err) => {
-    console.log(err); // 失败的回调
+    console.log(err); // 失败的回调onRejected
 })
 ```
 
-- 一个Promise拥有三种状态 Pending fufill reject
-只能由Pending 转移到另外两个状态之一，变化之后就不会再变更了
+- then的链式调用
+
+fulfilled 各个 onFulfilled 回调必须按其原始调用的顺序执行。
+rejected  各个 onRejected 回调必须按其原始调用的顺序执行。
+
+- then返回一个promise
