@@ -3,9 +3,47 @@ const FULLFILED = 'FULLFILED'; // 成功状态
 const REJECTED = 'REJECTED'; // 拒绝状态
 
 let resolvePromise = (promise2, x, resolve, reject) => {
-    // then 返回Promise自身： 按照规范约定直接抛出类型错误，不能自己等待自己，死循环
     if (promise2 === x) {
         return reject(new TypeError('陷入死循环'))
+    }
+
+    if (typeof x === 'object' && x !== null || typeof x === 'function') {
+        let called; // 考虑引入的第三方promise，的规范性问题，成功，失败，都只会执行一次，多次将被忽略，状态只能修改一次
+        try {
+            let then = x.then
+
+            if (typeof then === 'function') { 
+                then.call(
+                    x, 
+                    (data) => { 
+                        if (called) {
+                            return;
+                        }
+                        called = true;
+                        resolvePromise(promise2, data, resolve, reject) 
+                    }, 
+                    (err) => {
+                        if (called) {
+                            return;
+                        }
+                        called = true;
+                        reject(err)
+                    }
+                )
+            } else {
+                resolve(x)
+            }
+
+        } catch(err) {
+            if (called) {
+                return;
+            }
+            called = true;
+            reject(err)
+        }
+    } else {
+        resolve(x);
+        
     }
 }
 

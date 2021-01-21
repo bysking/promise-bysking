@@ -1,20 +1,17 @@
-let fs = require('fs');
-let Promise = require('./PromiseAPlus.js');
+let PromiseSelf = require('./PromiseAPlus.js');
 
-let p = new Promise((resolve, reject) => {
 
-    // 测试同步
+let Promise = new PromiseSelf((resolve, reject) => {
     resolve('hello world')
-
 });
 
+let promise2 = Promise.then(() => {
+    return promise2; // 返回自己： 直接抛出类型错误
+})
 
-
-p.then((data) => {
-    throw new Error('测试异常处理');
-}).then((data) => {
-    console.log('执行成功')
-}, (err) => { // 失败函数
-    console.log('执行失败')
+promise2.then((data) => {
+    console.log(data)
+}, (err) => {
+    console.log('--------------')
     console.log(err)
 })
