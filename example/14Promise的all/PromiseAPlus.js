@@ -2,6 +2,15 @@ const PENDING = 'PENDING'; // 等待状态
 const FULLFILED = 'FULLFILED'; // 成功状态
 const REJECTED = 'REJECTED'; // 拒绝状态
 
+// 判断Promsie
+let isPromise = function (p) {
+    if (typeof p === 'object' && p !== null || typeof p === 'function') {
+        return typeof p.then === 'function'
+    }
+
+    return false;
+}
+
 let resolvePromise = (promise2, x, resolve, reject) => {
     if (promise2 === x) {
         return reject(new TypeError('陷入死循环'))
@@ -55,6 +64,11 @@ class Promise {
         this.onrejectArrCb = [];
 
         let resolve = (value) => {
+
+            if (value instanceof Promise) {
+                return value.then(resolve, reject); // 如果出现resolve(new Promise)，则调用其then方法执行，直到解析一个普通值
+            }
+
             if (this.status === PENDING) {
                 this.status = FULLFILED;
                 this.value = value;
@@ -157,6 +171,49 @@ class Promise {
 
         return Promise2;
     }
+
+    catch(onreject) {
+        return this.then(null, onreject);
+    }
+}
+
+// 构造promises-aplus-tests 的测试属性，用于使用测试套件进行规范性用例测试
+Promise.deferred = function () {
+    let dfd = {}
+
+    dfd.promise = new Promise((resolve, reject) => {
+        dfd.resolve = resolve;
+        dfd.reject = reject;
+    })
+
+    return dfd;
+}
+
+Promise.all = function (promiseList) {
+
+    return new Promise((resolve, reject) => {
+        let resList = [];
+
+        let handlePromiseData = function (index, data) {
+            resList[index] = data;
+
+            if (resList.length === promiseList.length) {
+                resolve(resList)
+            }
+        }
+
+        promiseList.forEach((p, pIndex) => {
+            if (isPromise(p)) { // Promise处理
+                p.then(data => {
+                    handlePromiseData(pIndex, data)
+                }, err => {
+                    reject(err);
+                })
+            } else { // 普通值处理
+                handlePromiseData(pIndex, p)
+            }
+        })
+    })
 }
 
 module.exports = Promise;

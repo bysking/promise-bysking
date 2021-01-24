@@ -159,4 +159,16 @@ class Promise {
     }
 }
 
+// 构造promises-aplus-tests 的测试属性，用于使用测试套件进行规范性用例测试
+Promise.deferred = function () {
+    let dfd = {}
+
+    dfd.promise = new Promise((resolve, reject) => {
+        dfd.resolve = resolve;
+        dfd.reject = reject;
+    })
+
+    return dfd;
+}
+
 module.exports = Promise;
